@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::ops::{Index, IndexMut};
 
 pub struct LinkedNode<T> {
@@ -48,7 +49,6 @@ impl<T> LinkedNode<T> {
         }
     }
 
-
     pub fn iter(&self) -> LinkedIter<T> {
         LinkedIter {
             p: Some(self)
@@ -59,6 +59,46 @@ impl<T> LinkedNode<T> {
         LinkedIterMut {
             p: Some(self)
         }
+    }
+}
+
+impl<T> PartialOrd for LinkedNode<T>
+    where T: PartialOrd {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.data < other.data {
+            Some(Ordering::Less)
+        } else if self.data > other.data {
+            Some(Ordering::Greater)
+        } else {
+            Some(Ordering::Equal)
+        }
+    }
+
+    fn lt(&self, other: &Self) -> bool {
+        self.data < other.data
+    }
+
+    fn le(&self, other: &Self) -> bool {
+        self.data <= other.data
+    }
+
+    fn gt(&self, other: &Self) -> bool {
+        self.data > other.data
+    }
+
+    fn ge(&self, other: &Self) -> bool {
+        self.data >= other.data
+    }
+}
+
+impl<T> PartialEq for LinkedNode<T>
+    where T: PartialEq {
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
     }
 }
 
@@ -194,6 +234,15 @@ fn test_linked_list() {
     let v1 = node[2];
     println!("{:?}", v1);
     assert_eq!(v1, 1012);
+
+    assert_ne!(node[0], node[1]);
+    node[1] = 1010;
+    assert_eq!(node[0], node[1]);
+
+    assert!(node[2] > node[0]);
+    assert!(node[1] < node[2]);
+    assert!(node[0] <= node[1]);
+    assert!(node[0] >= node[1]);
 
 
     let mut x = vec![1, 2, 3];
